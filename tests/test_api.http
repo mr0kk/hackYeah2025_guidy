@@ -1,0 +1,63 @@
+### Health Check
+GET http://localhost:5000/api/health
+
+### Register User
+POST http://localhost:5000/api/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "test123"
+}
+
+### Login User
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com", 
+  "password": "test123"
+}
+
+### Get Current User
+GET http://localhost:5000/api/me
+
+### Create Profile
+POST http://localhost:5000/api/profile
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "age": 25,
+  "bio": "Test bio",
+  "location": "Warszawa"
+}
+
+### Get Profiles for Swiping
+GET http://localhost:5000/api/profiles?limit=5
+
+### Swipe Right
+POST http://localhost:5000/api/swipe
+Content-Type: application/json
+
+{
+  "profile_id": 2,
+  "direction": "right"
+}
+
+### Get Matches
+GET http://localhost:5000/api/matches
+
+### Get Messages
+GET http://localhost:5000/api/matches/1/messages
+
+### Send Message
+POST http://localhost:5000/api/matches/1/messages
+Content-Type: application/json
+
+{
+  "content": "Hello! Nice to match with you!"
+}
+
+### Get User Points
+GET http://localhost:5000/api/user/points

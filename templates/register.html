@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Rejestracja - GuideSwipe{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg border-0 rounded-lg mt-5" data-aos="fade-up">
+                <div class="card-header bg-white text-center py-4">
+                    <h3 class="fw-bold mb-0">Dołącz do GuideSwipe!</h3>
+                    <p class="text-muted mb-0">Utwórz swoje konto w kilku krokach</p>
+                </div>
+                <div class="card-body p-5">
+                    <form id="registerForm">
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                            <label for="email">
+                                <i class="fas fa-envelope me-2"></i>Adres email
+                            </label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required minlength="6">
+                            <label for="password">
+                                <i class="fas fa-lock me-2"></i>Hasło (min. 6 znaków)
+                            </label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
+                            <label for="confirmPassword">
+                                <i class="fas fa-lock me-2"></i>Powtórz hasło
+                            </label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                Akceptuję <a href="#" class="text-decoration-none">regulamin</a> i <a href="#" class="text-decoration-none">politykę prywatności</a>
+                            </label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="registerBtn">
+                                <span class="btn-text">
+                                    <i class="fas fa-user-plus me-2"></i>Utwórz konto
+                                </span>
+                                <span class="spinner-border spinner-border-sm d-none" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light text-center py-3">
+                    <p class="mb-0">Masz już konto? 
+                        <a href="{{ url_for('login') }}" class="fw-bold text-decoration-none">Zaloguj się</a>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Benefits Section -->
+            <div class="row g-3 mt-4">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="benefit-icon mb-2">
+                            <i class="fas fa-coins text-primary fa-2x"></i>
+                        </div>
+                        <h6>50 punktów startowych</h6>
+                        <small class="text-muted">Zacznij od razu!</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="benefit-icon mb-2">
+                            <i class="fas fa-shield-alt text-success fa-2x"></i>
+                        </div>
+                        <h6>Bezpieczne matche</h6>
+                        <small class="text-muted">System weryfikacji</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="benefit-icon mb-2">
+                            <i class="fas fa-star text-warning fa-2x"></i>
+                        </div>
+                        <h6>Lokalni eksperci</h6>
+                        <small class="text-muted">Najlepsi przewodnicy</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const registerBtn = document.getElementById('registerBtn');
+    const btnText = registerBtn.querySelector('.btn-text');
+    const spinner = registerBtn.querySelector('.spinner-border');
+    
+    // Validate passwords match
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+    
+    if (password !== confirmPassword) {
+        showFieldError('confirmPassword', 'Hasła nie są identyczne');
+        return;
+    }
+    
+    // Show loading state
+    registerBtn.disabled = true;
+    btnText.classList.add('d-none');
+    spinner.classList.remove('d-none');
+    
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: formData.get('email'),
+                password: password
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast('Konto utworzone pomyślnie! Witamy w GuideSwipe! 🎉', 'success');
+            setTimeout(() => {
+                window.location.href = '/profile';
+            }, 2000);
+        } else {
+            throw new Error(data.error || 'Błąd rejestracji');
+        }
+        
+    } catch (error) {
+        showToast(error.message, 'error');
+        
+        if (error.message.includes('Email already registered')) {
+            showFieldError('email', 'Ten adres email jest już zarejestrowany');
+        }
+    } finally {
+        // Hide loading state
+        registerBtn.disabled = false;
+        btnText.classList.remove('d-none');
+        spinner.classList.add('d-none');
+    }
+});
+
+function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const feedback = field.nextElementSibling.nextElementSibling;
+    
+    field.classList.add('is-invalid');
+    feedback.textContent = message;
+    
+    field.addEventListener('input', function() {
+        field.classList.remove('is-invalid');
+        feedback.textContent = '';
+    }, { once: true });
+}
+
+// Real-time password validation
+document.getElementById('confirmPassword').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = this.value;
+    
+    if (confirmPassword && password !== confirmPassword) {
+        this.classList.add('is-invalid');
+        this.nextElementSibling.nextElementSibling.textContent = 'Hasła nie są identyczne';
+    } else {
+        this.classList.remove('is-invalid');
+        this.nextElementSibling.nextElementSibling.textContent = '';
+    }
+});
+</script>
+{% endblock %}

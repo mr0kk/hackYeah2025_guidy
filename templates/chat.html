@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - GuideSwipe{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <!-- Chat Container -->
+        <div class="col-12">
+            <div class="chat-container d-flex flex-column" style="height: calc(100vh - 76px);">
+                
+                <!-- Chat Header -->
+                <div class="chat-header bg-white shadow-sm p-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <a href="{{ url_for('matches') }}" class="btn btn-link text-decoration-none me-3">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <div class="user-avatar me-3">
+                            <img id="otherUserPhoto" src="" alt="Profile" class="rounded-circle" width="50" height="50">
+                        </div>
+                        <div class="user-info flex-grow-1">
+                            <h5 class="mb-0" id="otherUserName">Ładowanie...</h5>
+                            <small class="text-muted" id="otherUserStatus">Online</small>
+                        </div>
+                        <div class="chat-actions">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="viewProfile()">
+                                        <i class="fas fa-user me-2"></i>Zobacz profil
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="bookGuide()">
+                                        <i class="fas fa-calendar-plus me-2"></i>Umów wycieczkę
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="reportUser()">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Zgłoś
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div class="messages-container flex-grow-1 p-3" id="messagesContainer" style="overflow-y: auto;">
+                    <!-- Match Notification -->
+                    <div class="text-center py-4" id="matchNotification">
+                        <div class="match-notification mx-auto p-3 rounded" style="max-width: 300px; background: linear-gradient(45deg, #667eea, #764ba2); color: white;">
+                            <i class="fas fa-heart fa-2x mb-2"></i>
+                            <h6 class="mb-2">Masz nowy match! 🎉</h6>
+                            <small>Rozpocznij rozmowę i zaplanujcie wspólną przygodę</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Messages will be loaded here -->
+                    <div id="messagesList">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Ładowanie wiadomości...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="message-input-container bg-white border-top p-3">
+                    <form id="messageForm" class="d-flex gap-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="messageInput" 
+                                   placeholder="Napisz wiadomość..." maxlength="1000" required>
+                            <button type="button" class="btn btn-outline-secondary" onclick="toggleEmojiPicker()">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    
+                    <!-- Emoji Picker (Simple) -->
+                    <div id="emojiPicker" class="emoji-picker mt-2 p-2 bg-light rounded d-none">
+                        <div class="emoji-grid">
+                            <span class="emoji-item" onclick="addEmoji('😊')">😊</span>
+                            <span class="emoji-item" onclick="addEmoji('😍')">😍</span>
+                            <span class="emoji-item" onclick="addEmoji('🤩')">🤩</span>
+                            <span class="emoji-item" onclick="addEmoji('😎')">😎</span>
+                            <span class="emoji-item" onclick="addEmoji('👍')">👍</span>
+                            <span class="emoji-item" onclick="addEmoji('❤️')">❤️</span>
+                            <span class="emoji-item" onclick="addEmoji('🎉')">🎉</span>
+                            <span class="emoji-item" onclick="addEmoji('🚀')">🚀</span>
+                            <span class="emoji-item" onclick="addEmoji('🏛️')">🏛️</span>
+                            <span class="emoji-item" onclick="addEmoji('🍕')">🍕</span>
+                            <span class="emoji-item" onclick="addEmoji('🥟')">🥟</span>
+                            <span class="emoji-item" onclick="addEmoji('🍺')">🍺</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Replies -->
+                    <div id="quickReplies" class="quick-replies mt-2">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-sm btn-outline-primary" onclick="sendQuickReply('Cześć! Jak się masz? 😊')">
+                                Cześć! 👋
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="sendQuickReply('Kiedy możemy się spotkać?')">
+                                Kiedy spotkanie? 📅
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="sendQuickReply('Jakie miejsca polecasz?')">
+                                Polecane miejsca? 🗺️
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="sendQuickReply('Ile kosztuje wycieczka?')">
+                                Koszt? 💰
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const matchId = {{ match_id }};
+let messagesPollingInterval;
+let lastMessageId = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadMatchInfo();
+    loadMessages();
+    startMessagesPolling();
+    
+    // Auto-hide quick replies after first message
+    setTimeout(() => {
+        const quickReplies = document.getElementById('quickReplies');
+        if (quickReplies && document.querySelectorAll('.message').length > 2) {
+            quickReplies.style.display = 'none';
+        }
+    }, 3000);
+});
+
+// Load match information
+async function loadMatchInfo() {
+    try {
+        const response = await fetch('/api/matches');
+        const data = await response.json();
+        
+        if (response.ok) {
+            const match = data.matches.find(m => m.id === matchId);
+            if (match) {
+                document.getElementById('otherUserName').textContent = match.other_user.profile?.name || 'Użytkownik';
+                document.getElementById('otherUserPhoto').src = match.other_user.profile?.photo_url || '/static/img/profile-placeholder.jpg';
+                
+                // Hide match notification if there are messages
+                if (match.last_message) {
+                    document.getElementById('matchNotification').style.display = 'none';
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error loading match info:', error);
+    }
+}
+
+// Load messages
+async function loadMessages() {
+    try {
+        const response = await fetch(`/api/matches/${matchId}/messages`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            displayMessages(data.messages);
+            if (data.messages.length > 0) {
+                document.getElementById('matchNotification').style.display = 'none';
+                lastMessageId = Math.max(...data.messages.map(m => m.id));
+            }
+        }
+    } catch (error) {
+        console.error('Error loading messages:', error);
+        document.getElementById('messagesList').innerHTML = `
+            <div class="text-center py-4 text-danger">
+                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                <p class="mb-0">Błąd ładowania wiadomości</p>
+                <button class="btn btn-sm btn-outline-primary mt-2" onclick="loadMessages()">
+                    Spróbuj ponownie
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Display messages
+function displayMessages(messages) {
+    const messagesList = document.getElementById('messagesList');
+    
+    if (messages.length === 0) {
+        messagesList.innerHTML = `
+            <div class="text-center py-4 text-muted">
+                <i class="fas fa-comments fa-3x mb-3"></i>
+                <p class="mb-0">Rozpocznij rozmowę!</p>
+                <small>Napisz pierwszą wiadomość</small>
+            </div>
+        `;
+        return;
+    }
+    
+    const messagesHtml = messages.map(message => {
+        const isOwn = message.sender_id === {{ current_user.id }};
+        const messageClass = isOwn ? 'message-own' : 'message-other';
+        const alignClass = isOwn ? 'text-end' : 'text-start';
+        
+        const timeFormatted = new Date(message.created_at).toLocaleTimeString('pl-PL', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        return `
+            <div class="message ${messageClass} mb-3 ${alignClass}">
+                <div class="message-content ${isOwn ? 'bg-primary text-white' : 'bg-light'} p-3 rounded-3 d-inline-block" style="max-width: 70%;">
+                    <p class="mb-1">${escapeHtml(message.content)}</p>
+                    <small class="${isOwn ? 'text-white-50' : 'text-muted'}">${timeFormatted}</small>
+                </div>
+                ${!isOwn ? `<div class="message-sender mt-1"><small class="text-muted">${message.sender_name}</small></div>` : ''}
+            </div>
+        `;
+    }).join('');
+    
+    messagesList.innerHTML = messagesHtml;
+    scrollToBottom();
+}
+
+// Send message
+document.getElementById('messageForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value.trim();
+    
+    if (!message) return;
+    
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+    
+    try {
+        const response = await fetch(`/api/matches/${matchId}/messages`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                content: message
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            messageInput.value = '';
+            loadMessages(); // Reload messages to show new one
+            hideQuickReplies();
+        } else {
+            throw new Error(data.error || 'Błąd wysyłania wiadomości');
+        }
+        
+    } catch (error) {
+        showToast(error.message, 'error');
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    }
+});
+
+// Start polling for new messages
+function startMessagesPolling() {
+    messagesPollingInterval = setInterval(async () => {
+        try {
+            const response = await fetch(`/api/matches/${matchId}/messages`);
+            const data = await response.json();
+            
+            if (response.ok && data.messages.length > 0) {
+                const newestMessageId = Math.max(...data.messages.map(m => m.id));
+                
+                if (newestMessageId > lastMessageId) {
+                    displayMessages(data.messages);
+                    lastMessageId = newestMessageId;
+                    
+                    // Show notification for new message
+                    const newestMessage = data.messages.find(m => m.id === newestMessageId);
+                    if (newestMessage && newestMessage.sender_id !== {{ current_user.id }}) {
+                        // Play notification sound or vibrate
+                        if (navigator.vibrate) navigator.vibrate(200);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error polling messages:', error);
+        }
+    }, 3000); // Check every 3 seconds
+}
+
+// Utility functions
+function scrollToBottom() {
+    const container = document.getElementById('messagesContainer');
+    container.scrollTop = container.scrollHeight;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function toggleEmojiPicker() {
+    const picker = document.getElementById('emojiPicker');
+    picker.classList.toggle('d-none');
+}
+
+function addEmoji(emoji) {
+    const input = document.getElementById('messageInput');
+    input.value += emoji;
+    input.focus();
+    toggleEmojiPicker();
+}
+
+function sendQuickReply(message) {
+    document.getElementById('messageInput').value = message;
+    document.getElementById('messageForm').dispatchEvent(new Event('submit'));
+}
+
+function hideQuickReplies() {
+    const quickReplies = document.getElementById('quickReplies');
+    if (quickReplies) {
+        quickReplies.style.display = 'none';
+    }
+}
+
+function viewProfile() {
+    showToast('Funkcja w przygotowaniu', 'info');
+}
+
+function bookGuide() {
+    if (confirm('Czy chcesz umówić wycieczkę z tym przewodnikiem?')) {
+        showToast('Funkcja rezerwacji w przygotowaniu', 'info');
+    }
+}
+
+function reportUser() {
+    if (confirm('Czy na pewno chcesz zgłosić tego użytkownika?')) {
+        showToast('Zgłoszenie zostało wysłane', 'success');
+    }
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (messagesPollingInterval) {
+        clearInterval(messagesPollingInterval);
+    }
+});
+
+// Auto-resize input on mobile
+const messageInput = document.getElementById('messageInput');
+messageInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.chat-container {
+    background: #f8f9fa;
+}
+
+.messages-container {
+    background: #ffffff;
+    background-image: 
+        radial-gradient(circle at 1px 1px, rgba(0,0,0,.05) 1px, transparent 0);
+    background-size: 20px 20px;
+}
+
+.message-own .message-content {
+    background: var(--primary-gradient) !important;
+}
+
+.emoji-picker {
+    max-width: 300px;
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+
+.emoji-item {
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.emoji-item:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.quick-replies .btn {
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .chat-header {
+        position: sticky;
+        top: 76px;
+        z-index: 1000;
+    }
+    
+    .message-content {
+        font-size: 0.9rem;
+    }
+    
+    .quick-replies {
+        overflow-x: auto;
+    }
+    
+    .quick-replies .d-flex {
+        flex-wrap: nowrap;
+    }
+}
+</style>
+{% endblock %}

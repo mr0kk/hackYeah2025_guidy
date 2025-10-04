@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - GuideSwipe{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient text-white border-0" style="background: var(--primary-gradient);" data-aos="fade-down">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-2">
+                                <i class="fas fa-wave-square me-2"></i>
+                                Witaj, <span id="userName">{% if current_user.profile %}{{ current_user.profile.name }}{% else %}{{ current_user.email.split('@')[0] }}{% endif %}!</span>
+                            </h2>
+                            <p class="mb-0 lead">Gotowy na nową przygodę? Sprawdź co nowego!</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ url_for('swipe') }}" class="btn btn-light">
+                                    <i class="fas fa-search me-1"></i>Znajdź przewodnika
+                                </a>
+                                <a href="{{ url_for('matches') }}" class="btn btn-outline-light">
+                                    <i class="fas fa-comments me-1"></i>Matche
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon mb-3" style="color: var(--bs-primary);">
+                        <i class="fas fa-coins fa-2x"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1" id="pointsBalance">{{ current_user.points_balance or 0 }}</h3>
+                    <p class="text-muted mb-0">Dostępne punkty</p>
+                    <small class="text-success">+{{ current_user.total_points_earned or 0 }} zarobione</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon mb-3" style="color: var(--bs-success);">
+                        <i class="fas fa-heart fa-2x"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1" id="totalMatches">0</h3>
+                    <p class="text-muted mb-0">Matche</p>
+                    <small class="text-info" id="newMatches">0 nowych</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon mb-3" style="color: var(--bs-warning);">
+                        <i class="fas fa-star fa-2x"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1" id="userLevel">1</h3>
+                    <p class="text-muted mb-0">Poziom</p>
+                    <small class="text-warning" id="levelName">Nowicjusz</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon mb-3" style="color: var(--bs-info);">
+                        <i class="fas fa-map-marked-alt fa-2x"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1" id="totalTours">0</h3>
+                    <p class="text-muted mb-0">Wycieczki</p>
+                    <small class="text-muted">W tym miesiącu</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row g-4">
+        <!-- Recent Activity -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm" data-aos="fade-right">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Ostatnia aktywność
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="recentActivity" class="activity-list">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Ładowanie...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm" data-aos="fade-left">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Szybkie akcje
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('swipe') }}" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Znajdź przewodnika
+                        </a>
+                        <a href="{{ url_for('profile') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-user-edit me-2"></i>Edytuj profil
+                        </a>
+                        <a href="{{ url_for('matches') }}" class="btn btn-outline-success">
+                            <i class="fas fa-comments me-2"></i>Sprawdź wiadomości
+                        </a>
+                        <button class="btn btn-outline-info" onclick="shareApp()">
+                            <i class="fas fa-share me-2"></i>Poleć znajomym
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Matches -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Nowe matche
+                    </h6>
+                    <a href="{{ url_for('matches') }}" class="text-decoration-none small">Zobacz wszystkie</a>
+                </div>
+                <div class="card-body p-0">
+                    <div id="recentMatches" class="list-group list-group-flush">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+    loadRecentMatches();
+    loadRecentActivity();
+});
+
+async function loadDashboardData() {
+    try {
+        // Load user points and stats
+        const response = await fetch('/api/user/points');
+        const data = await response.json();
+        
+        if (response.ok) {
+            updatePointsDisplay(data.balance);
+            document.getElementById('pointsBalance').textContent = data.balance;
+            document.getElementById('userLevel').textContent = data.level.level;
+            document.getElementById('levelName').textContent = data.level.name;
+        }
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
+
+async function loadRecentMatches() {
+    try {
+        const response = await fetch('/api/matches?limit=3');
+        const data = await response.json();
+        
+        if (response.ok) {
+            document.getElementById('totalMatches').textContent = data.count;
+            
+            const matchesContainer = document.getElementById('recentMatches');
+            
+            if (data.matches.length === 0) {
+                matchesContainer.innerHTML = `
+                    <div class="text-center py-3 text-muted">
+                        <i class="fas fa-heart-broken fa-2x mb-2"></i>
+                        <p class="mb-0">Brak nowych matchy</p>
+                        <small><a href="/swipe">Rozpocznij swipowanie!</a></small>
+                    </div>
+                `;
+            } else {
+                const matchesHtml = data.matches.map(match => `
+                    <a href="/chat/${match.id}" class="list-group-item list-group-item-action">
+                        <div class="d-flex align-items-center">
+                            <img src="${match.other_user.profile?.photo_url || '/static/img/profile-placeholder.jpg'}" 
+                                 class="rounded-circle me-3" width="40" height="40" alt="Profile">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">${match.other_user.profile?.name || 'Użytkownik'}</h6>
+                                <small class="text-muted">
+                                    ${match.last_message ? match.last_message.content.substring(0, 30) + '...' : 'Nowy match! 🎉'}
+                                </small>
+                            </div>
+                            ${match.last_message && !match.last_message.is_read && match.last_message.sender_id !== {{ current_user.id }} ? 
+                              '<span class="badge bg-danger rounded-pill">!</span>' : ''}
+                        </div>
+                    </a>
+                `).join('');
+                
+                matchesContainer.innerHTML = matchesHtml;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading recent matches:', error);
+        document.getElementById('recentMatches').innerHTML = `
+            <div class="text-center py-3 text-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p class="mb-0 small">Błąd ładowania matchy</p>
+            </div>
+        `;
+    }
+}
+
+async function loadRecentActivity() {
+    try {
+        const response = await fetch('/api/user/points');
+        const data = await response.json();
+        
+        if (response.ok && data.recent_transactions) {
+            const activityContainer = document.getElementById('recentActivity');
+            
+            if (data.recent_transactions.length === 0) {
+                activityContainer.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-history fa-3x mb-3"></i>
+                        <p class="mb-0">Brak aktywności</p>
+                        <small>Rozpocznij używanie aplikacji!</small>
+                    </div>
+                `;
+            } else {
+                const activitiesHtml = data.recent_transactions.slice(0, 5).map(transaction => {
+                    const icon = transaction.amount > 0 ? 'fas fa-plus-circle text-success' : 'fas fa-minus-circle text-danger';
+                    const sign = transaction.amount > 0 ? '+' : '';
+                    
+                    return `
+                        <div class="activity-item d-flex align-items-center py-2 border-bottom">
+                            <div class="activity-icon me-3">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <p class="mb-1">${transaction.reason}</p>
+                                <small class="text-muted">${new Date(transaction.created_at).toLocaleDateString('pl-PL')}</small>
+                            </div>
+                            <div class="activity-points">
+                                <span class="badge ${transaction.amount > 0 ? 'bg-success' : 'bg-danger'}">
+                                    ${sign}${Math.abs(transaction.amount)} pts
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                activityContainer.innerHTML = activitiesHtml;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading recent activity:', error);
+        document.getElementById('recentActivity').innerHTML = `
+            <div class="text-center py-3 text-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p class="mb-0">Błąd ładowania aktywności</p>
+            </div>
+        `;
+    }
+}
+
+function shareApp() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'GuideSwipe',
+            text: 'Sprawdź GuideSwipe - najlepszą aplikację do znajdowania lokalnych przewodników!',
+            url: window.location.origin
+        });
+    } else {
+        // Fallback - copy to clipboard
+        const url = window.location.origin;
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('Link skopiowany do schowka!', 'success');
+        });
+    }
+}
+</script>
+{% endblock %}

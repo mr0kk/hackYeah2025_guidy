@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Logowanie - GuideSwipe{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card shadow-lg border-0 rounded-lg mt-5" data-aos="fade-up">
+                <div class="card-header bg-white text-center py-4">
+                    <h3 class="fw-bold mb-0">Witaj ponownie!</h3>
+                    <p class="text-muted mb-0">Zaloguj się do swojego konta</p>
+                </div>
+                <div class="card-body p-5">
+                    <form id="loginForm">
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                            <label for="email">
+                                <i class="fas fa-envelope me-2"></i>Adres email
+                            </label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                            <label for="password">
+                                <i class="fas fa-lock me-2"></i>Hasło
+                            </label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">
+                                Zapamiętaj mnie
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="loginBtn">
+                                <span class="btn-text">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Zaloguj się
+                                </span>
+                                <span class="spinner-border spinner-border-sm d-none" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <a href="#" class="text-decoration-none">Zapomniałeś hasła?</a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center py-3">
+                    <p class="mb-0">Nie masz konta? 
+                        <a href="{{ url_for('register') }}" class="fw-bold text-decoration-none">Zarejestruj się</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Demo Accounts -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h6 class="card-title">
+                        <i class="fas fa-info-circle text-info me-2"></i>Konta demo
+                    </h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="btn btn-outline-info btn-sm" onclick="fillDemoAccount('tourist')">
+                                Turysta demo
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-info btn-sm" onclick="fillDemoAccount('guide')">
+                                Przewodnik demo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const loginBtn = document.getElementById('loginBtn');
+    const btnText = loginBtn.querySelector('.btn-text');
+    const spinner = loginBtn.querySelector('.spinner-border');
+    
+    // Show loading state
+    loginBtn.disabled = true;
+    btnText.classList.add('d-none');
+    spinner.classList.remove('d-none');
+    
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: formData.get('email'),
+                password: formData.get('password')
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast('Zalogowano pomyślnie!', 'success');
+            setTimeout(() => {
+                window.location.href = data.user.profile ? '/dashboard' : '/profile';
+            }, 1000);
+        } else {
+            throw new Error(data.error || 'Błąd logowania');
+        }
+        
+    } catch (error) {
+        showToast(error.message, 'error');
+        
+        // Show field-specific errors
+        if (error.message.includes('email')) {
+            showFieldError('email', 'Nieprawidłowy adres email');
+        }
+        if (error.message.includes('password')) {
+            showFieldError('password', 'Nieprawidłowe hasło');
+        }
+    } finally {
+        // Hide loading state
+        loginBtn.disabled = false;
+        btnText.classList.remove('d-none');
+        spinner.classList.add('d-none');
+    }
+});
+
+function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const feedback = field.nextElementSibling.nextElementSibling; // Skip label, get feedback
+    
+    field.classList.add('is-invalid');
+    feedback.textContent = message;
+    
+    // Clear error on input
+    field.addEventListener('input', function() {
+        field.classList.remove('is-invalid');
+        feedback.textContent = '';
+    }, { once: true });
+}
+
+function fillDemoAccount(type) {
+    if (type === 'tourist') {
+        document.getElementById('email').value = 'tourist@demo.com';
+        document.getElementById('password').value = 'demo123';
+    } else if (type === 'guide') {
+        document.getElementById('email').value = 'anna@demo.com';
+        document.getElementById('password').value = 'demo123';
+    }
+}
+</script>
+{% endblock %}
