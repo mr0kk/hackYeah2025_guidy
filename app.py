@@ -4,12 +4,16 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "strona glowna"
+    return render_template('index.html')
 
 # Trasa z parametrem
 @app.route('/about')         # Strona /about
 def about():
     return "O nas"
+
+@app.route('/login')         # Strona /about
+def do_start():
+    return "ekran logowania"
 
 @app.route('/user/<name>')   # Parametr w URL
 def user_profile(name):

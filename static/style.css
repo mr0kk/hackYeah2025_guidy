@@ -1,0 +1,132 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', Arial, sans-serif;
+    background: #000001;
+}
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+.left-panel, .right-panel {
+    flex: 1 1 50%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+.left-panel {
+    background: #000001;
+    color: #fff;
+    z-index: 2;
+    padding: 3vw 1vw;
+}
+.logo {
+    width: 95px;
+    margin-bottom: 40px;
+}
+h1 {
+    font-size: 2.8rem;
+    margin: 0 0 35px 0;
+    letter-spacing: 2px;
+}
+.btn {
+    background: #ff8300;
+    color: #fff;
+    padding: 18px 40px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    border: none;
+    text-decoration: none;
+    box-shadow: 0 2px #d37d03;
+    transition: background 0.2s;
+    margin-top: 40px;
+    cursor: pointer;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.btn:hover {
+    background: #cc6d00;
+}
+.right-panel {
+    background: linear-gradient(120deg, #ffb46a 0%, #ff8300 100%);
+    justify-content: center;
+    align-items: center;
+    min-height: 340px;
+}
+.bg-img {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.91;
+    z-index: 1;
+    pointer-events: none;
+}
+.right-text {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 400;
+    line-height: 1.15;
+    text-align: left;
+    padding: 3vw 7vw 3vw 7vw;
+    word-break: break-word;
+}
+.right-text b {
+    font-weight: 700;
+    color: #ffdc8b;
+}
+
+.full-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* dopasowanie przy zachowaniu proporcji */
+    object-position: center; /* wyśrodkowanie */
+    z-index: 0;
+}
+
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+    }
+    .left-panel, .right-panel {
+        flex: unset;
+        width: 100vw;
+        min-height: 38vh;
+        max-width: 100vw;
+    }
+    .right-text {
+        font-size: 1.5rem;
+        padding: 2vw 6vw;
+    }
+    .logo {
+        width: 65px;
+        margin-bottom: 25px;
+    }
+    h1 {
+        font-size: 2rem;
+    }
+}
+@media (max-width: 500px) {
+    .left-panel, .right-panel {
+        padding: 20px 0;
+        min-height: 30vh;
+    }
+    .right-text {
+        font-size: 1.1rem;
+        padding: 12px;
+    }
+    .logo {
+        width: 45px;
+    }
+}
