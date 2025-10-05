@@ -26,7 +26,7 @@ def create_demo_users():
     )
     db.session.add(tourist_profile)
     
-    # Demo guides
+    # Demo guides - DODANO PHOTO_URL DO KAŻDEGO
     guides_data = [
         {
             "email": "anna@demo.com",
@@ -36,7 +36,8 @@ def create_demo_users():
             "bio": "Lokalny food expert! Znam najlepsze pierogi w mieście 🥟",
             "specialties": ["Food Tours", "Local Cuisine"],
             "hourly_rate": 25,
-            "rating": 4.8
+            "rating": 4.8,
+            "photo_url": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face"
         },
         {
             "email": "michal@demo.com", 
@@ -46,7 +47,41 @@ def create_demo_users():
             "bio": "Historyk i przewodnik miejski 🏛️",
             "specialties": ["History Tours", "Architecture"],
             "hourly_rate": 30,
-            "rating": 4.9
+            "rating": 4.9,
+            "photo_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face"
+        },
+        {
+            "email": "zofia@demo.com",
+            "name": "Zofia Wiśniewska",
+            "age": 25,
+            "location": "Gdańsk, Stare Miasto",
+            "bio": "Miłośniczka sztuki i lokalnej kultury. Oprowadzę Cię po najpiękniejszych galeriach! 🎨",
+            "specialties": ["Art Tours", "Galleries", "Street Art"],
+            "hourly_rate": 22,
+            "rating": 4.7,
+            "photo_url": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face"
+        },
+        {
+            "email": "jakub@demo.com",
+            "name": "Jakub Lewandowski", 
+            "age": 29,
+            "location": "Wrocław, Rynek",
+            "bio": "Nocne życie to moja pasja! Pokażę Ci najlepsze kluby i puby we Wrocławiu 🌃🍻",
+            "specialties": ["Nightlife", "Pubs", "Live Music"],
+            "hourly_rate": 20,
+            "rating": 4.6,
+            "photo_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face"
+        },
+        {
+            "email": "marta@demo.com",
+            "name": "Marta Zielińska",
+            "age": 31,
+            "location": "Poznań, Stary Rynek",
+            "bio": "Aktywna i pełna energii! Rowery, jogging, outdoor - poznaj Poznań aktywnie! 🚴‍♀️",
+            "specialties": ["Active Tours", "Cycling", "Outdoor Activities"],
+            "hourly_rate": 28,
+            "rating": 4.8,
+            "photo_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face"
         }
     ]
     
@@ -70,7 +105,7 @@ def create_demo_users():
             average_rating=guide_data["rating"],
             total_reviews=random.randint(20, 50),
             profile_type=ProfileType.GUIDE,
-            photo_url=f"https://images.unsplash.com/photo-{random.randint(1000000, 9999999)}?w=400"
+            photo_url=guide_data["photo_url"]  # DODANO TĘ LINIĘ
         )
         db.session.add(profile)
     

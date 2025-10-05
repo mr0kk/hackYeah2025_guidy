@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Rejestracja - GuideSwipe{% endblock %}
+{% block title %}Rejestracja - Guidy{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -8,7 +8,7 @@
         <div class="col-lg-6 col-md-8">
             <div class="card shadow-lg border-0 rounded-lg mt-5" data-aos="fade-up">
                 <div class="card-header bg-white text-center py-4">
-                    <h3 class="fw-bold mb-0">Dołącz do GuideSwipe!</h3>
+                    <h3 class="fw-bold mb-0">Dołącz do Guidy!</h3>
                     <p class="text-muted mb-0">Utwórz swoje konto w kilku krokach</p>
                 </div>
                 <div class="card-body p-5">
@@ -139,7 +139,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         const data = await response.json();
         
         if (response.ok) {
-            showToast('Konto utworzone pomyślnie! Witamy w GuideSwipe! 🎉', 'success');
+            showToast('Konto utworzone pomyślnie! Witamy w Guidy! 🎉', 'success');
             setTimeout(() => {
                 window.location.href = '/profile';
             }, 2000);

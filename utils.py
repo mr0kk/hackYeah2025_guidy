@@ -50,7 +50,7 @@ def generate_mock_profiles(count=10):
             "bio": "Lokalny food expert! Znam najlepsze pierogi w mieście i ukryte skarby kulinarnej Krakowa 🥟✨",
             "specialties": ["Food Tours", "Local Cuisine", "Historic Restaurants"],
             "languages": ["Polish", "English", "German"],
-            "photo_url": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400",
+            "photo_url": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face",
             "hourly_rate": 25,
             "rating": 4.8
         },
@@ -61,7 +61,7 @@ def generate_mock_profiles(count=10):
             "bio": "Historyk i przewodnik miejski. Pokażę Ci Warszawę, której nie znajdziesz w guidebooku! 🏛️📚",
             "specialties": ["History Tours", "Architecture", "Museums"],
             "languages": ["Polish", "English", "French"],
-            "photo_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+            "photo_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
             "hourly_rate": 30,
             "rating": 4.9
         },
@@ -72,7 +72,7 @@ def generate_mock_profiles(count=10):
             "bio": "Miłośniczka sztuki i lokalnej kultury. Oprowadzę Cię po najpiękniejszych galeriach i artystycznych dzielnicach! 🎨",
             "specialties": ["Art Tours", "Galleries", "Street Art"],
             "languages": ["Polish", "English"],
-            "photo_url": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400",
+            "photo_url": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
             "hourly_rate": 22,
             "rating": 4.7
         },
@@ -83,7 +83,7 @@ def generate_mock_profiles(count=10):
             "bio": "Nocne życie to moja pasja! Pokażę Ci najlepsze kluby, puby i miejsca na imprezę we Wrocławiu 🌃🍻",
             "specialties": ["Nightlife", "Pubs", "Live Music"],
             "languages": ["Polish", "English"],
-            "photo_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400",
+            "photo_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
             "hourly_rate": 20,
             "rating": 4.6
         },
@@ -94,7 +94,7 @@ def generate_mock_profiles(count=10):
             "bio": "Aktywna i pełna energii! Rowery, jogging, outdoor activities - poznaj Poznań w aktywny sposób! 🚴‍♀️🏃‍♀️",
             "specialties": ["Active Tours", "Cycling", "Outdoor Activities"],
             "languages": ["Polish", "English", "Spanish"],
-            "photo_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400",
+            "photo_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face",
             "hourly_rate": 28,
             "rating": 4.8
         }
@@ -111,7 +111,7 @@ def generate_mock_profiles(count=10):
             age=data["age"],
             location=data["location"],
             bio=data["bio"],
-            photo_url=data["photo_url"],
+            photo_url=data["photo_url"],  # DODANO TĘ LINIĘ
             specialties=data["specialties"],
             languages=data["languages"],
             hourly_rate=data["hourly_rate"],
@@ -122,6 +122,7 @@ def generate_mock_profiles(count=10):
         profiles.append(profile)
     
     return profiles
+
 
 def calculate_points_for_booking(guide_hourly_rate, duration_hours=2):
     """Calculate points needed for booking"""

@@ -133,7 +133,7 @@ class SwipeManager {
             
             // Check for match
             if (response.match) {
-                setTimeout(() => this.showMatchPopup(response.match), 300);
+                setTimeout(() => this.showMatchPopup(response.match_data), 300);
             }
             
         } catch (error) {
@@ -173,7 +173,7 @@ class SwipeManager {
     createCardHTML(profile) {
         return `
             <div class="swipe-card" data-profile-id="${profile.id}">
-                <img src="${profile.photo || '/static/img/profile-placeholder.jpg'}" 
+                <img src="${profile.photo_url || '/static/img/profile-placeholder.jpg'}" 
                      alt="${profile.name}" class="card-image">
                 <div class="card-content">
                     <div class="card-header">
@@ -186,9 +186,9 @@ class SwipeManager {
                     <div class="card-bio">${profile.bio}</div>
                     <div class="card-footer">
                         <div class="card-rating">
-                            ⭐ ${profile.rating}
+                            ⭐ ${profile.average_rating || profile.rating}
                         </div>
-                        <div class="card-price">${profile.price} pts</div>
+                        <div class="card-price">${profile.hourly_rate || profile.price} pts</div>
                     </div>
                 </div>
             </div>
@@ -202,8 +202,8 @@ class SwipeManager {
             <div class="match-popup">
                 <div class="match-title">IT'S A MATCH! 🎉</div>
                 <div class="match-profiles">
-                    <img src="${matchData.user_photo}" class="match-avatar" alt="You">
-                    <img src="${matchData.guide_photo}" class="match-avatar" alt="${matchData.guide_name}">
+                    <img src="${matchData.user_photo || '/static/img/profile-placeholder.jpg'}" class="match-avatar" alt="You">
+                    <img src="${matchData.guide_photo || '/static/img/profile-placeholder.jpg'}" class="match-avatar" alt="${matchData.guide_name}">
                 </div>
                 <div class="match-message">
                     Możesz teraz porozmawiać z ${matchData.guide_name}!
@@ -296,6 +296,6 @@ function goToChat(matchId) {
 // === INITIALIZE WHEN DOM IS READY ===
 document.addEventListener('DOMContentLoaded', () => {
     if (document.querySelector('.swipe-container')) {
-        new SwipeManager();
+        window.swipeManager = new SwipeManager();
     }
 });
