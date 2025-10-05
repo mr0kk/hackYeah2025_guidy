@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="static/log-style.css">
+    <!-- Dodaj ikony FontAwesome lub Google Material Icons, jeśli chcesz -->
+</head>
+<body>
+<div class="register-container">
+    <form class="register-form" method="POST" action="/login">
+        <h1>Sign in to GUIDY</h1>
+        <p class="subtitle">Fill your information below or register with your social account.</p>
+  
+		<label for="email">Email</label>
+        <input type="email" id="email" placeholder="twojbesciakwokolicy@best.pw.edu.pl">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="*************">
+        <!-- <div class="check-row">
+            <input type="checkbox" id="terms">
+            <label for="terms">Agree with <a href="#">Terms &amp; Condition</a></label>
+        </div> -->
+        <button type="submit" class="sign-up">Sign In</button>
+    </form>
+    <div class="register-side">
+        <div class="socials">
+            <hr><span>Or sign up with</span><hr>
+        </div>
+        <div class="social-icons">
+            <button title="Sign up with Apple" class="icon-btn">
+                <img src="static/apple.png" alt="Apple" />
+            </button>
+            <button title="Sign up with Google" class="icon-btn">
+                <img src="static/google.png" alt="Google" />
+            </button>
+            <button title="Sign up with Facebook" class="icon-btn">
+                <img src="static/fb.png" alt="Facebook" />
+            </button>
+        </div>
+        <p class="signin">
+            Don't have an account? <a href="#">Sign up</a>
+        </p>
+        <img class="bg-wave" src="static/wave2.png" alt="Decoration" />
+    </div>
+</div>
+</body>
+</html>

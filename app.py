@@ -6,26 +6,26 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-# Trasa z parametrem
-@app.route('/about')         # Strona /about
-def about():
-    return "O nas"
-
 @app.route('/login')         # Strona /about
 def do_start():
-    return "ekran logowania"
+    return render_template('logowanie.html')
 
-@app.route('/user/<name>')   # Parametr w URL
-def user_profile(name):
-    return f"Profil użytkownika: {name}"
-
-
-@app.route('/contact', methods=['GET', 'POST'])
-def contact():
+@app.route('/login', methods=['GET', 'POST'])
+def do_login():
+    error = None
     if request.method == 'POST':
-        return "Formularz został wysłany!"
-    else:
-        return "Wyświetl formularz kontaktowy"
+        email = request.form.get('email')
+        password = request.form.get('password')
+        # Przykładowy warunek – zamień na własny system autoryzacji!
+        if email == 'twojbesciakwokolicy@best.pw.edu.pl' and password == 'haslo123':
+            return redirect(url_for('dashboard'))
+        else:
+            error = 'Nieprawidłowy email lub hasło!'
+    return render_template('logowanie.html', error=error)
+
+@app.route('/dashboard')
+def dashboard():
+    return "Witaj w swoim dashboardzie!"
 
 # Uruchamianie aplikacji
 if __name__ == '__main__':
